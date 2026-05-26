@@ -5,7 +5,3 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .git/
-Dockerfile/
-requirements.txt/
-test.html/
-test_cors.py/
