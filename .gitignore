@@ -5,7 +5,8 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .git/
-Dockerfile/
+Dockerfile
+.dockerignore
 requirements.txt
 test.html
 test_cors.py
