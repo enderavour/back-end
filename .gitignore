@@ -1,11 +1,11 @@
 venv/
 .zed/
-.env/
+.env
 __pycache__/
 *.pyc
 .pytest_cache/
 .git/
 Dockerfile/
-requirements.txt/
-test.html/
-test_cors.py/
+requirements.txt
+test.html
+test_cors.py
