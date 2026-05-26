@@ -1,2 +1,6 @@
 /venv
 /.zed
+__pycache__/
+.pytest_pycache/
+.env
+*.pyc
