@@ -8,17 +8,24 @@ from sqlalchemy.ext.asyncio import (
 
 from app.core.config import settings
 
-engine = create_async_engine(settings.DATABASE_URL)
 
-AsyncSessionLocal = async_sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
+@pytest_asyncio.fixture
+async def engine():
+    engine = create_async_engine(settings.DATABASE_URL)
+
+    yield engine
+
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture
-async def db_session():
+async def db_session(engine):
+    AsyncSessionLocal = async_sessionmaker(
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+
     async with AsyncSessionLocal() as session:
         yield session
 
@@ -33,4 +40,4 @@ async def redis_client():
 
     yield client
 
-    await client.close()
+    await client.aclose()

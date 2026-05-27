@@ -1,47 +1,38 @@
-# Task BE #3: Add Database
+# Task BE #4: Add Migrations
 
-Added Docker Compose, integrated PostgreSQL/Redis databases, configured volumes in Docker Compose  
+Created Models, Pydantic schemas, created and run migrations, added logging 
 
-1. To run the application:
+1. To run the container:
 ```bash
 docker compose up --build 
 ```
 
-2. To manually test the PostgreSQL connection: 
+2. To run migrations:
+```bash
+alembic revision --autogenerate -m "create users table"
 ```
+
+3. Apply migrations:
+```bash
+alembic upgrade head
+```
+
+4. Check Users table:
+```bash
 docker compose exec postgres psql -U postgres -d internship
 ```
-Afterwards, in shell type:
-```sql
-SELECT 1; 
+And then enter:
 ```
-The result should be selected column with 1. 
-
-
-3. To manually check Redis connection: 
-```bash
-docker compose exec redis redis-cli
-```
-Then, in the prompt enter ```PING```
-The output should be ```PONG```
-
-4. In order to check Docker image hot reloading: 
-Change "detail": "ok" into "detail": "changed" in routers/heatlh.py, and in the output there should be the following logs: 
-```bash 
-fastapi_app  | WARNING:  StatReload detected changes in 'app/routers/health.py'. Reloading...
-fastapi_app  | INFO:     Shutting down
-fastapi_app  | INFO:     Waiting for application shutdown.
-fastapi_app  | INFO:     Application shutdown complete.
-fastapi_app  | INFO:     Finished server process [8]
-fastapi_app  | INFO:     Started server process [9]
-fastapi_app  | INFO:     Waiting for application startup.
-fastapi_app  | INFO:     Application startup complete.
-fastapi_app  | WARNING:  StatReload detected changes in 'app/routers/health.py'. Reloading...
-fastapi_app  | INFO:     Shutting down 
+\d users
 ```
 
-5. Run the tests 
+4. Run the tests 
 To run the tests: 
 ```bash 
 docker compose exec app pytest
 ```
+
+### Notes:
+- Alembic uses synchronous PostgreSQL driver (psycopg2)
+- Application uses async PostgreSQL driver (asyncpg)
+- Logging added for debugging and monitoring
