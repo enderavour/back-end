@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.logger import logger
+
 
 def setup_cors(app: FastAPI) -> None:
     app.add_middleware(
@@ -10,3 +12,4 @@ def setup_cors(app: FastAPI) -> None:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    logger.info("Middleware added")
