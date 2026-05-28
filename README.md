@@ -1,38 +1,15 @@
-# Task BE #4: Add Migrations
+# Task BE #5: Add User CRUD Operations
 
-Created Models, Pydantic schemas, created and run migrations, added logging 
+Implemented Updating, Creating, and Deleting of users, as well as getting all users. Added pagination to user rertieval function. 
+Added logging for CRUD operations. 
 
 1. To run the container:
 ```bash
 docker compose up --build 
 ```
 
-2. To run migrations:
-```bash
-alembic revision --autogenerate -m "create users table"
-```
-
-3. Apply migrations:
-```bash
-alembic upgrade head
-```
-
-4. Check Users table:
-```bash
-docker compose exec postgres psql -U postgres -d internship
-```
-And then enter:
-```
-\d users
-```
-
-4. Run the tests 
+2. To run the tests 
 To run the tests: 
 ```bash 
 docker compose exec app pytest
 ```
-
-### Notes:
-- Alembic uses synchronous PostgreSQL driver (psycopg2)
-- Application uses async PostgreSQL driver (asyncpg)
-- Logging added for debugging and monitoring

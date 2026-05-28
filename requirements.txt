@@ -28,3 +28,6 @@ pytest_asyncio==1.4.0
 alembic==1.18.4
 psycopg2-binary==2.9.12
 pydantic[email]
+passlib == 1.7.4
+bcrypt==3.2.2
+httpx==0.28.1
