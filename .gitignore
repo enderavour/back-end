@@ -1,12 +1,6 @@
-venv/
-.zed/
-.env
+/venv
+/.zed
 __pycache__/
+.pytest_pycache/
+.env
 *.pyc
-.pytest_cache/
-.git/
-Dockerfile
-.dockerignore
-requirements.txt
-test.html
-test_cors.py
