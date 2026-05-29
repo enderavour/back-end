@@ -1,7 +1,7 @@
 # Task BE #2: Add Dockerfile
 
 Added Dockerfile and .dockerignore into the project, implemented CORS with two origins 
-There is also test.html file - which is testing file, for manual CORS testing of my application.
+
 Run the app:
 ```
 uvicorn app.main:app --reload
