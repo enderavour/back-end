@@ -33,4 +33,4 @@ async def redis_client():
 
     yield client
 
-    await client.close()
+    await client.aclose()

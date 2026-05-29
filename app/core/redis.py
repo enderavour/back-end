@@ -1,5 +1,3 @@
-from os import getenv
-
 import redis.asyncio as redis
 
 from app.core.config import settings
