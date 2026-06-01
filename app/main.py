@@ -1,9 +1,20 @@
-from app.core.cors import setup_cors
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
+from app.core.cors import setup_cors
+from app.core.redis import redis_client
 from app.routers.health import router as health_router
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+
+    await redis_client.aclose()
+
+
+app = FastAPI(lifespan=lifespan)
 
 setup_cors(app)
 

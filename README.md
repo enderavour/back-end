@@ -1,8 +1,10 @@
-# Task BE #2: Add Dockerfile
+# Task BE #3: Add Database
 
-Added Dockerfile and .dockerignore into the project, implemented CORS with two origins 
+Added Docker Compose, integrated PostgreSQL/Redis databases, configured volumes in Docker Compose  
 
-Run the app:
+1. To run the application:
+```bash
+docker compose up --build 
 ```
 uvicorn app.main:app --reload
 ```
@@ -13,24 +15,41 @@ python -m http.server 3000
 And open http://localhost:3000/test.html in browser, afterwards open Dev Tools and navigate into JS console. 
 There should be response {status_code: 200, detail: 'ok', result: 'working'} or Object with these values. 
 
-To build the Docker image: 
+2. To manually test the PostgreSQL connection: 
 ```
-docker build -t fastapi-app .
+docker compose exec postgres psql -U postgres -d internship
+```
+Afterwards, in shell type:
+```sql
+SELECT 1; 
+```
+The result should be selected column with 1. 
+
+
+3. To manually check Redis connection: 
+```bash
+docker compose exec redis redis-cli
+```
+Then, in the prompt enter ```PING```
+The output should be ```PONG```
+
+4. In order to check Docker image hot reloading: 
+Change "detail": "ok" into "detail": "changed" in routers/heatlh.py, and in the output there should be the following logs: 
+```bash 
+fastapi_app  | WARNING:  StatReload detected changes in 'app/routers/health.py'. Reloading...
+fastapi_app  | INFO:     Shutting down
+fastapi_app  | INFO:     Waiting for application shutdown.
+fastapi_app  | INFO:     Application shutdown complete.
+fastapi_app  | INFO:     Finished server process [8]
+fastapi_app  | INFO:     Started server process [9]
+fastapi_app  | INFO:     Waiting for application startup.
+fastapi_app  | INFO:     Application startup complete.
+fastapi_app  | WARNING:  StatReload detected changes in 'app/routers/health.py'. Reloading...
+fastapi_app  | INFO:     Shutting down 
 ```
 
-To run the docker image:
-```
-docker run -p 127.0.0.1:8000:8000 fastapi-app 
-```
-
-To run the tests inside Docker:
-1. Get the image name:
-```
-docker images
-```
-There should be image with the similar name: fastapi-app:latest (on my machine)
-
-2. Run the tests (replace fastapi-app:latest with other name if it is different):
-```
-docker run -e PYTHONPATH=. -it  fastapi-app:latest pytest
+5. Run the tests 
+To run the tests: 
+```bash 
+docker compose exec app pytest
 ```
