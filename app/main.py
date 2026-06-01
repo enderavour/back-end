@@ -6,6 +6,7 @@ from app.core.logger import logger
 from app.db.base import Base
 from app.routers.health import router as health_router
 from app.routers.user import router as user_router
+from app.routers.auth import router as auth_router
 
 app = FastAPI()
 
@@ -20,4 +21,5 @@ setup_cors(app)
 
 app.include_router(health_router)
 app.include_router(user_router)
+app.include_router(auth_router)
 logger.info("Application started")
