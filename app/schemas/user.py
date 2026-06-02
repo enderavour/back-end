@@ -22,6 +22,7 @@ class SignInRequest(BaseModel):
 
 class UserUpdateRequest(BaseModel):
     username: str | None = None
+    password: str | None = None
 
 
 class UserDetailResponse(UserSchema):
