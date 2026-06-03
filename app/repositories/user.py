@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logger import logger
 from app.models.user import User
 
-
 class UserRepository:
     @staticmethod
     async def get_all(

@@ -1,6 +1,6 @@
-# Task BE #7: Add Validation
+# Task BE #8: Add Company CRUD
 
-Added User Profile Editing restrictions, Deletion control. Added tests on updating user username and password. 
+Implemented Company CRUD, added Owner role, enabled the previleged of the Owner, implemented endpoints for listing companies and retrieving them by ID. 
 
 1. To run the container:
 ```bash
