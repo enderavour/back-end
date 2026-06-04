@@ -9,6 +9,9 @@ from app.schemas.company import (
     CompanySchema,
 )
 from app.services.company import CompanyService
+from app.services.company_member import CompanyMemberService
+from app.services.invitation import InvitationService
+from app.services.join_request import JoinRequestService
 
 router = APIRouter(
     prefix="/companies",
@@ -93,4 +96,39 @@ async def change_visibility(
         company_id,
         current_user.id,
         is_visible
+    )
+
+
+@router.get("/{company_id}/members")
+async def company_members(
+    company_id: int,
+    skip: int = 0,
+    limit: int = 10,
+    db=Depends(get_db),
+):
+    return await CompanyMemberService.get_company_members(
+        db,
+        company_id,
+        skip,
+        limit
+    )
+
+@router.get("/{company_id}/invitations")
+async def company_invitations(
+    company_id: int,
+    db=Depends(get_db),
+):
+    return await InvitationService.get_company_invitations(
+        db,
+        company_id
+    )
+
+@router.get("/{company_id}/requests")
+async def company_requests(
+    company_id: int,
+    db=Depends(get_db),
+):
+    return await JoinRequestService.get_company_requests(
+        db,
+        company_id
     )
