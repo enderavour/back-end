@@ -7,7 +7,15 @@ from app.db.base import Base
 from app.routers.health import router as health_router
 from app.routers.user import router as user_router
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+
+    await redis_client.aclose()
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.on_event("startup")
