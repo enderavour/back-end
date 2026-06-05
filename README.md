@@ -16,6 +16,7 @@ alembic revision --autogenerate -m "create users table"
 ```bash
 alembic upgrade head
 ```
+The result should be selected column with 1. 
 
 4. Check Users table:
 ```bash
