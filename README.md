@@ -1,6 +1,6 @@
-# Task BE #9: Add Company Actions
+# Task BE #10: Add Admin Role
 
-Added Invitation and Membership management, User and Owner controls, endpoints for requests and invitations. Added tests for testing designed functionality. 
+Implemented an Admin role, added permissions of Owner to appoint and remove administrators, implemented endpoints to view the list of administratores in the company. Added test_admin.py to cover the created functionality. 
 
 1. To run the container:
 ```bash
