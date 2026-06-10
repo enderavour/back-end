@@ -8,7 +8,7 @@ from app.db.deps import get_db
 from app.services.quiz import QuizService
 from app.core.security import get_auth_user
 from app.schemas.quiz import QuizCreate
-
+from app.schemas.quiz_submit import QuizSubmitRequest
 
 router = APIRouter(
     prefix="/quizzes",
@@ -72,3 +72,55 @@ async def delete_quiz(
     await QuizService.delete_quiz(db, quiz)
 
     return {"message": "Quiz deleted"}
+
+
+@router.post(
+    "/quizzes/{quiz_id}/take"
+)
+async def take_quiz(
+    quiz_id: int,
+    data: QuizSubmitRequest,
+    current_user=Depends(get_auth_user),
+    db=Depends(get_db)
+):
+    quiz = await QuizService.get_quiz(
+        db,
+        quiz_id
+    )
+
+    return await QuizService.take_quiz(
+        db,
+        quiz,
+        current_user,
+        data.answers
+    )
+
+
+@router.get(
+    "/companies/{company_id}/stats"
+)
+async def company_stats(
+    company_id: int,
+    current_user=Depends(get_auth_user),
+    db=Depends(get_db)
+):
+    return {
+        "average": await QuizService.get_company_average(
+            db,
+            current_user.id,
+            company_id
+        )
+    }
+
+
+@router.get("/stats")
+async def global_stats(
+    current_user=Depends(get_auth_user),
+    db=Depends(get_db)
+):
+    return {
+        "average": await QuizService.get_global_average(
+            db,
+            current_user.id
+        )
+    }

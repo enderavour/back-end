@@ -1,15 +1,16 @@
-from this import s
-
 from fastapi import HTTPException
 
 from app.models.quiz import Quiz
 from app.models.quiz import Question
 from app.models.quiz import AnswerOption
+from app.models.quiz_attempt import QuizAttempt
+from app.models.user_answer import UserAnswer
 
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.orm import selectinload
+import datetime
 
 class QuizService:
-
     @staticmethod
     async def create_quiz(
         db,
@@ -29,7 +30,6 @@ class QuizService:
         )
 
         db.add(quiz)
-
         await db.flush()
 
         for question_data in data.questions:
@@ -94,8 +94,6 @@ class QuizService:
 
         return result.scalars().all()
 
-
-
     @staticmethod
     async def delete_quiz(
         db,
@@ -103,3 +101,124 @@ class QuizService:
     ):
         await db.delete(quiz)
         await db.commit()
+
+    @staticmethod
+    async def take_quiz(db, quiz, user, answers):
+        result = await db.execute(
+            select(Quiz)
+            .options(
+                selectinload(Quiz.questions)
+                .selectinload(Question.answers)
+            )
+            .where(Quiz.id == quiz.id)
+        )
+
+        quiz = result.scalar_one()
+
+        correct = 0
+        total = len(quiz.questions)
+
+        attempt = QuizAttempt(
+            user_id=user.id,
+            company_id=quiz.company_id,
+            quiz_id=quiz.id,
+            correct_answers=0,
+            total_questions=total
+        )
+
+        db.add(attempt)
+        await db.flush()
+
+        for answer_data in answers:
+            question = next(
+                q for q in quiz.questions
+                if q.id == answer_data.question_id
+            )
+
+            correct_ids = {int(a.id) for a in question.answers if a.is_correct}
+            selected_ids = {int(x) for x in answer_data.answer_ids}
+
+            is_correct = correct_ids == selected_ids
+
+            if is_correct:
+                correct += 1
+
+            for answer_id in selected_ids:
+                db.add(
+                    UserAnswer(
+                        attempt_id=attempt.id,
+                        question_id=question.id,
+                        answer_id=answer_id,
+                        is_correct=is_correct
+                    )
+                )
+
+        attempt.correct_answers = correct
+
+        user.last_quiz_attempt_at = datetime.datetime.now()
+        db.add(user)
+
+        await db.flush()
+        await db.commit()
+        await db.refresh(attempt)
+
+        return {
+            "correct_answers": correct,
+            "total_questions": total,
+            "score": round(correct / total * 100, 2) if total else 0
+        }
+
+    @staticmethod
+    async def get_company_average(
+        db,
+        user_id,
+        company_id
+    ):
+        result = await db.execute(
+            select(QuizAttempt)
+            .where(
+                QuizAttempt.user_id == user_id,
+                QuizAttempt.company_id == company_id
+            )
+        )
+
+        attempts = result.scalars().all()
+
+        if not attempts:
+            return 0
+
+        scores = [
+            (a.correct_answers / a.total_questions) * 100
+            for a in attempts
+        ]
+
+        return round(sum(scores) / len(scores), 2)
+
+
+    @staticmethod
+    async def get_global_average(
+        db,
+        user_id
+    ):
+        result = await db.execute(
+            select(
+                func.sum(
+                    QuizAttempt.correct_answers
+                ),
+                func.sum(
+                    QuizAttempt.total_questions
+                )
+            ).where(
+                QuizAttempt.user_id == user_id
+            )
+        )
+
+        correct, total = result.one()
+
+        if not total:
+            return 0
+
+        return round(
+            correct / total * 100,
+            2
+        )

@@ -1,6 +1,6 @@
-from sqlalchemy import String
+from sqlalchemy import String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from datetime import datetime
 from app.db.base import Base
 from app.db.mixins import TimestampMixin
 
@@ -15,4 +15,8 @@ class User(Base, TimestampMixin):
     companies = relationship(
         "Company",
         back_populates="owner"
+    )
+    last_quiz_attempt_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
     )
