@@ -1,6 +1,6 @@
-# Task BE #13: Redis Workflow
+# Task BE #14: Add Export Data 
 
-Implemented a Redis storage for holding quiz responses for 48 hours, wrote tests to check the implemented functionality. 
+Created possibility to export data in JSON and CSV formats. Created appropriate role management rules in order to access and export quiz data. Created test cases for implemented functionality. 
 
 1. To run the container:
 ```bash
