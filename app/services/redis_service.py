@@ -1,6 +1,7 @@
 import json
 
 from app.core.redis import get_redis
+import time
 
 class RedisQuizService:
     @staticmethod
@@ -20,7 +21,8 @@ class RedisQuizService:
             "quiz_id": quiz_id,
             "question_id": question_id,
             "answer_id": answer_id,
-            "is_correct": is_correct
+            "is_correct": is_correct,
+            "timestamp": time.time()
         }
 
         await get_redis().set(

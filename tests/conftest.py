@@ -60,3 +60,9 @@ async def redis_client():
 async def client():
     async with AsyncClient(base_url="http://localhost:8000") as ac:
         yield ac
+
+@pytest_asyncio.fixture(autouse=True)
+async def clear_redis(redis_client):
+    await redis_client.flushdb()
+    yield
+    await redis_client.flushdb()
