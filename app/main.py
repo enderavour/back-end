@@ -12,7 +12,15 @@ from app.routers.quiz import router as quiz_router
 from app.routers.export import router as export_router
 from app.routers.analytics import router as analytics_router
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+
+    await redis_client.aclose()
+
+
+app = FastAPI(lifespan=lifespan)
 
 @app.on_event("startup")
 async def startup():
