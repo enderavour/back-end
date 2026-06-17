@@ -1,6 +1,6 @@
-# Task BE #15: Add Analytics
+# Task BE #16: Add Notifications
 
-Created possibility to export data in JSON and CSV formats. Created appropriate role management rules in order to access and export quiz data. Created and run test cases for implemented functionality. 
+Implemented notification system, which automatically invites users on created quiz by the company, and implemented user interaction with notifications (users can view them, mark them as read)
 
 1. To run the container:
 ```bash
