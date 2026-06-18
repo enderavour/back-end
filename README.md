@@ -1,6 +1,7 @@
-# Task BE #16: Add Notifications
+# Task BE #17: Add Notifications
 
-Implemented notification system, which automatically invites users on created quiz by the company, and implemented user interaction with notifications (users can view them, mark them as read)
+Implemented a script for checking the completion of quizzes by users, which send notifications every midnight, with APScheduler.
+Added tests to test implemented functionality. 
 
 1. To run the container:
 ```bash

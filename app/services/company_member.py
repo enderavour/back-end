@@ -116,3 +116,12 @@ class CompanyMemberService:
             )
 
         return member
+
+    @staticmethod
+    async def get_user_companies(db, user_id: int):
+        result = await db.execute(
+            select(CompanyMember)
+            .where(CompanyMember.user_id == user_id)
+        )
+
+        return result.scalars().all()

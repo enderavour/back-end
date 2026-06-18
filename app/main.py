@@ -11,11 +11,14 @@ from app.routers.company import router as company_router
 from app.routers.quiz import router as quiz_router
 from app.routers.export import router as export_router
 from app.routers.analytics import router as analytics_router
+from .scheduler import scheduler, setup_scheduler
 
 app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
+    setup_scheduler()
+    scheduler.start()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
