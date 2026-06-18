@@ -1,4 +1,4 @@
-# Task BE #17: Add Notifications
+# Task BE #17: Add Schedule Script
 
 Implemented a script for checking the completion of quizzes by users, which send notifications every midnight, with APScheduler.
 Added tests to test implemented functionality. 
