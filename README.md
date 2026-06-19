@@ -25,3 +25,8 @@ docker compose exec app alembic upgrade head
 ```bash 
 docker compose exec app pytest
 ```
+
+### Notes:
+- Alembic uses synchronous PostgreSQL driver (psycopg2)
+- Application uses async PostgreSQL driver (asyncpg)
+- Logging added for debugging and monitoring
