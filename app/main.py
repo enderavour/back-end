@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
 from app.core.cors import setup_cors
 from app.core.database import engine
