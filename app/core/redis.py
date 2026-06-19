@@ -3,10 +3,9 @@
 from os import getenv
 import redis.asyncio as redis
 
-from app.core.config import settings
+REDIS_HOST = getenv("REDIS_HOST")
+REDIS_PORT = getenv("REDIS_PORT")
 
-REDIS_HOST = settings.REDIS_HOST
-REDIS_PORT = settings.REDIS_PORT
 
 
 def get_redis():
