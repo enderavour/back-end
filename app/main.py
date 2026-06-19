@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
 from app.core.cors import setup_cors
 from app.core.database import engine
@@ -10,7 +11,15 @@ from app.routers.auth import router as auth_router
 from app.routers.company import router as company_router
 from app.routers.quiz import router as quiz_router
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+
+    await redis_client.aclose()
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.on_event("startup")
