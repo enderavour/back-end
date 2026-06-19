@@ -25,3 +25,9 @@ class Company(Base, TimestampMixin):
     )
 
     owner = relationship("User", back_populates="companies")
+
+    quizzes = relationship(
+        "Quiz",
+        back_populates="company",
+        cascade="all, delete-orphan"
+    )
