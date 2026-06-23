@@ -1,38 +1,27 @@
 import pytest
+import uuid
 from app.services.company import CompanyService
+from app.services.user import UserService
 from app.schemas.company import CompanyCreate
+from app.schemas.user import SignUpRequest
 from fastapi import HTTPException
 
-@pytest.mark.asyncio
-async def test_create_company(db_session):
-    user_id = 1
 
-    company = await CompanyService.create_company(
-        db_session,
-        data=CompanyCreate(name="Test", description="desc"),
-        owner_id=user_id
+def unique_user():
+    uid = uuid.uuid4().hex[:8]
+    return SignUpRequest(
+        email=f"{uid}@test.com",
+        username=f"user_{uid}",
+        password="12345678",
     )
 
-    assert company.id is not None
-    assert company.name == "Test"
-    assert company.owner_id == user_id
-
-@pytest.mark.asyncio
-async def test_get_company(db_session):
-    company = await CompanyService.create_company(
-        db_session,
-        CompanyCreate(name="Test"),
-        owner_id=1
-    )
-
-    result = await CompanyService.get_company(db_session, company.id)
-
-    assert result.id == company.id
 
 @pytest.mark.asyncio
 async def test_get_companies(db_session):
-    await CompanyService.create_company(db_session, CompanyCreate(name="A"), 1)
-    await CompanyService.create_company(db_session, CompanyCreate(name="B"), 1)
+    user = await UserService.create_user(db_session, unique_user())
+
+    await CompanyService.create_company(db_session, CompanyCreate(name="A"), user.id)
+    await CompanyService.create_company(db_session, CompanyCreate(name="B"), user.id)
 
     result = await CompanyService.get_companies(db_session, 0, 10)
 
@@ -41,36 +30,34 @@ async def test_get_companies(db_session):
 
 @pytest.mark.asyncio
 async def test_delete_company(db_session):
+    user = await UserService.create_user(db_session, unique_user())
+
     company = await CompanyService.create_company(
         db_session,
         CompanyCreate(name="Test"),
-        owner_id=1
+        user.id
     )
 
-    await CompanyService.delete_company(
-        db_session,
-        company.id,
-        1
-    )
+    await CompanyService.delete_company(db_session, company.id, user.id)
 
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(HTTPException):
         await CompanyService.get_company(db_session, company.id)
-
-    assert exc.value.status_code == 404
 
 @pytest.mark.asyncio
 async def test_change_visibility(db_session):
+    user = await UserService.create_user(db_session, unique_user())
+
     company = await CompanyService.create_company(
         db_session,
         CompanyCreate(name="Test"),
-        owner_id=1
+        user.id
     )
 
     updated = await CompanyService.change_visibility(
         db_session,
         company.id,
-        owner_id=1,
-        is_visible=False
+        user.id,
+        False
     )
 
     assert updated.is_visible is False

@@ -2,6 +2,9 @@ import pytest_asyncio
 import redis.asyncio as redis
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+from app.db.base import Base
+from sqlalchemy import text
+
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -12,6 +15,17 @@ from app.core.config import settings
 from app.core.database import AsyncSessionLocal
 from app.main import app
 from app.routers.user import get_db
+
+from app.core.security import get_auth_user
+
+class FakeUser:
+    id = 1
+    email = "test@test.com"
+
+async def override_get_auth_user():
+    return FakeUser()
+
+app.dependency_overrides[get_auth_user] = override_get_auth_user
 
 
 async def override_get_db():

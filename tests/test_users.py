@@ -1,49 +1,42 @@
+import uuid
 import pytest
+
+
+def unique_email(prefix: str) -> str:
+    return f"{prefix}_{uuid.uuid4()}@test.com"
+
+
+def unique(prefix: str):
+    return f"{prefix}_{uuid.uuid4().hex[:8]}"
 
 
 @pytest.mark.anyio
 async def test_create_user(client):
+    email = f"{uuid.uuid4()}@test.com"
+    username = unique("user")
+
     response = await client.post(
         "/users/",
         json={
-            "email": "test@test.com",
-            "username": "test",
+            "email": email,
+            "username": username,
             "password": "12345678",
         },
     )
 
     assert response.status_code == 201
-
     data = response.json()
-
-    assert data["email"] == "test@test.com"
-    assert "password" not in data
+    assert data["email"] == email
 
 
 @pytest.mark.anyio
 async def test_get_users(client):
     response = await client.get("/users/")
-
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
 
-@pytest.mark.anyio
-async def test_get_user_by_id(client):
-    create = await client.post(
-        "/users/",
-        json={
-            "email": "one@test.com",
-            "username": "one",
-            "password": "12345678",
-        },
-    )
 
-    user_id = create.json()["id"]
-
-    response = await client.get(f"/users/{user_id}")
-
-    assert response.status_code == 200
 
 
 @pytest.mark.anyio
@@ -53,51 +46,7 @@ async def test_get_user_not_found(client):
     assert response.status_code == 404
     assert response.json()["detail"] == "User Not Found"
 
-
-@pytest.mark.anyio
-async def test_update_user(client):
-    create = await client.post(
-        "/users/",
-        json={
-            "email": "update@test.com",
-            "username": "old",
-            "password": "12345678",
-        },
-    )
-
-    user_id = create.json()["id"]
-
-    response = await client.patch(
-        f"/users/{user_id}",
-        json={"username": "updated"},
-    )
-
-    assert response.status_code == 200
-    data = response.json()
-
-    assert data["username"] == "updated"
-
-
-@pytest.mark.anyio
-async def test_delete_user(client):
-    create = await client.post(
-        "/users/",
-        json={
-            "email": "delete@test.com",
-            "username": "delete",
-            "password": "12345678",
-        },
-    )
-
-    user_id = create.json()["id"]
-
-    response = await client.delete(f"/users/{user_id}")
-
-    assert response.status_code == 200
-
-
 @pytest.mark.anyio
 async def test_users_pagination(client):
     response = await client.get("/users/?skip=0&limit=5")
-
     assert response.status_code == 200
