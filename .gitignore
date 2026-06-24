@@ -4,3 +4,4 @@ __pycache__/
 .pytest_pycache/
 .env
 *.pyc
+internship-server.pem
