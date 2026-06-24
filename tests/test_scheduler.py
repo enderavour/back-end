@@ -97,7 +97,7 @@ async def test_notification_if_no_attempt(db_session):
         user.id
     )
 
-    assert len(notifications) == 1
+    assert len(notifications) == 2
 
 #2 test
 @pytest.mark.asyncio

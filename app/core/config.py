@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     AUTH0_DOMAIN: str
     AUTH0_AUDIENCE: str
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(extra="ignore")
 
 
 settings = Settings()

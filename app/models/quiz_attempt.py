@@ -1,8 +1,8 @@
 from app.db.base import Base
 from app.db.mixins import TimestampMixin
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, DateTime
-from datetime import datetime
+from datetime import datetime, UTC
 
 class QuizAttempt(Base, TimestampMixin):
     __tablename__ = "quiz_attempts"

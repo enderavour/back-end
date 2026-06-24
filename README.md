@@ -1,14 +1,5 @@
-# Task BE #17: Add Schedule Script
+# Task BE #19: Add AWS Structure 
 
-Implemented a script for checking the completion of quizzes by users, which send notifications every midnight, with APScheduler.
-Added tests to test implemented functionality. 
+Hosted FastAPI, PostgreSQL and Redis on EC2, ElastiCache and RDS. 
 
-1. To run the container:
-```bash
-docker compose up --build 
-```
-
-2. To run the tests 
-```bash 
-docker compose exec app pytest
-```
+The hosted application is available by the following link: http://13.53.134.246:8000/docs
