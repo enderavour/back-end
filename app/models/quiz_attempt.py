@@ -17,7 +17,7 @@ class QuizAttempt(Base, TimestampMixin):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow()
+        default=datetime.utcnow
     )
 
     correct_answers: Mapped[int]

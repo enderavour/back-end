@@ -4,45 +4,58 @@ from app.services.company_member import CompanyMemberService
 from app.services.quiz import QuizService
 from app.services.notification import NotificationService
 from app.models.quiz_attempt import QuizAttempt
+from app.models.company_member import CompanyMember
+from app.models.quiz import Quiz
+from app.models.user import User
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_, or_
 
 class SchedulerService:
     @staticmethod
     async def check_quizzes(db):
-        users = await UserService.get_users(db, skip=0, limit=1000)
+            limit = datetime.utcnow() - timedelta(hours=24)
 
-        now = datetime.utcnow()
-        limit = now - timedelta(hours=24)
+            stmt = (
+                select(
+                    User.id.label("user_id"),
+                    Quiz.title.label("quiz_title"),
+                    func.max(QuizAttempt.created_at).label("last_attempt"),
+                )
+                .join(
+                    CompanyMember,
+                    CompanyMember.user_id == User.id,
+                )
+                .join(
+                    Quiz,
+                    Quiz.company_id == CompanyMember.company_id,
+                )
+                .outerjoin(
+                    QuizAttempt,
+                    and_(
+                        QuizAttempt.user_id == User.id,
+                        QuizAttempt.quiz_id == Quiz.id,
+                    ),
+                )
+                .group_by(
+                    User.id,
+                    Quiz.id,
+                    Quiz.title,
+                )
+                .having(
+                    or_(
+                        func.max(QuizAttempt.created_at).is_(None),
+                        func.max(QuizAttempt.created_at) < limit,
+                    )
+                )
+            )
 
-        for user in users:
-            companies = await CompanyMemberService.get_user_companies(db, user.id)
+            result = await db.execute(stmt)
 
-            for member in companies:
-                company_id = member.company_id
-
-                quizzes = await QuizService.get_company_quizzes(
+            for row in result:
+                await NotificationService.create(
                     db,
-                    company_id,
-                    skip=0,
-                    limit=10000
+                    row.user_id,
+                    f'Please complete quiz "{row.quiz_title}"',
                 )
 
-                for quiz in quizzes:
-                    result = await db.execute(
-                        select(func.max(QuizAttempt.created_at)).where(
-                            QuizAttempt.user_id == user.id,
-                            QuizAttempt.quiz_id == quiz.id
-                        )
-                    )
-
-                    last_attempt = result.scalar()
-
-                    if last_attempt is None or last_attempt < limit:
-                        await NotificationService.create(
-                            db,
-                            user.id,
-                            f'Please complete quiz "{quiz.title}"'
-                        )
-
-        await db.commit()
+            await db.commit()
