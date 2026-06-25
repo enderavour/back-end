@@ -2,8 +2,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
-from app.models.user import User
-
+from app.models.user import User, UserDTO
+from app.core.security import hash_password
 
 class UserRepository:
     @staticmethod
@@ -23,7 +23,13 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def create(db: AsyncSession, user: User):
+    async def create(db: AsyncSession, user_dto: UserDTO):
+        user = User(
+            email=user_dto.email,
+            username=user_dto.username,
+            password=user_dto.password
+        )
+
         db.add(user)
         await db.commit()
         await db.refresh(user)

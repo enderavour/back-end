@@ -4,13 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import AsyncSessionLocal
 from app.schemas.user import SignUpRequest, UserSchema, UserUpdateRequest
 from app.services.user import UserService
+from app.db.deps import get_db
 
 router = APIRouter(prefix="/users", tags=["Users"])
-
-
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 
 @router.post("/", response_model=UserSchema, status_code=201)
