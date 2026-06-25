@@ -19,9 +19,6 @@ app = FastAPI()
 async def startup():
     setup_scheduler()
     scheduler.start()
-#    async with engine.begin() as conn:
-#        await conn.run_sync(Base.metadata.create_all)
-
 
 setup_cors(app)
 
