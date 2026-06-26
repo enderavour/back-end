@@ -8,40 +8,20 @@ from app.core.security import (
     verify_password,
     create_access_token
 )
+from app.services.auth import AuthService
+from app.schemas.auth import TokenResponseDTO
 
 router = APIRouter(
     prefix="/auth",
     tags=["Auth"]
 )
 
-@router.post("/signin")
+@router.post("/signin", response_model=TokenResponseDTO)
 async def signin(
     data: SignInRequest,
     db: AsyncSession = Depends(get_db)
 ):
-    user = await UserService.get_user_by_email(
-        db,
-        data.email
-    )
-
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
-        )
-
-    if not verify_password(data.password, user.password):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
-        )
-
-    token = create_access_token({"sub": str(user.id)})
-
-    return {
-        "access_token": token,
-        "token_type": "bearer"
-    }
+    return await AuthService.signin(db, data)
 
 
 @router.post("/signup")

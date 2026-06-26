@@ -9,7 +9,6 @@ from app.repositories.user import UserRepository
 from app.schemas.user import SignUpRequest, UserUpdateRequest
 from passlib.context import CryptContext
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
@@ -104,37 +103,29 @@ class UserService:
         db: AsyncSession,
         user_id: int,
     ):
-        result = await db.execute(select(User).where(User.id == user_id))
-
-        return result.scalar_one_or_none()
+        result = await UserRepository.get_by_id(db, user_id)
+        return result
 
     @staticmethod
     async def get_user_by_email(
         db: AsyncSession,
         email: str
     ):
-        result = await db.execute(
-            select(User).where(User.email == email)
-        )
-
-        return result.scalar_one_or_none()
+        result = await UserRepository.get_by_email(db, email)
+        return result
 
 
     @staticmethod
     async def get_or_create_auth0_user(db: AsyncSession, email: str):
-        user = await UserService.get_user_by_email(
-            db, email
-        )
+        user = await UserService.get_user_by_email(db, email)
 
         if user:
             return user
 
-        user = User(
-            email=email,
-            username=email.split("@")[0],
-            password=""
-        )
+        user = {
+            "email": email,
+            "username": email.split("@")[0],
+            "password": ""
+        }
 
-        return await UserRepository.create(
-            db, user
-        )
+        return await UserRepository.create_from_dict(db, user)

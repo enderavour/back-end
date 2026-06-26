@@ -7,23 +7,20 @@ from jose.exceptions import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.auth0 import verify_auth0_token, decode_auth0_token
 from app.db.deps import get_db
-
-from app.services.user import UserService
+from app.core.config import settings
+from app.services.user import pwd_context
 from app.schemas.user import SignUpRequest
 
+from app.services.user import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/signin")
-
-SECRET_KEY = "super_secret_key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def decode_token(token: str) -> dict:
     try:
         payload = jwt.decode(
             token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM],
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
         )
         return payload
 
@@ -38,11 +35,11 @@ def verify_password(plain_password: str, hashed_password: str):
 def create_access_token(data: dict):
     payload = data.copy()
 
-    expire = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     payload.update({"exp": expire})
 
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 async def get_current_user(
@@ -66,8 +63,6 @@ async def get_auth_user(
     db: AsyncSession = Depends(get_db),
 ):
     payload = decode_auth0_token(token)
-
-    print(payload)
 
     email = payload.get("email")
 
