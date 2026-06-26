@@ -56,8 +56,8 @@ async def test_get_user_not_found(client):
 
 @pytest.mark.anyio
 async def test_update_user(client):
-    create = await client.post(
-        "/users/",
+    signup = await client.post(
+        "/auth/signup",
         json={
             "email": "update@test.com",
             "username": "old",
@@ -65,16 +65,35 @@ async def test_update_user(client):
         },
     )
 
-    user_id = create.json()["id"]
+    assert signup.status_code == 200
+
+    user_id = signup.json()["id"]
+
+    login = await client.post(
+        "/auth/signin",
+        json={
+            "email": "update@test.com",
+            "password": "12345678",
+        },
+    )
+
+    assert login.status_code == 200
+
+    token = login.json()["access_token"]
+
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
 
     response = await client.patch(
         f"/users/{user_id}",
         json={"username": "updated"},
+        headers=headers,
     )
 
     assert response.status_code == 200
-    data = response.json()
 
+    data = response.json()
     assert data["username"] == "updated"
 
 
