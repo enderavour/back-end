@@ -20,13 +20,13 @@ class UserService:
         try:
             logger.info(f"Creating user with email={data.email}")
 
-            user = User(
+            user_dto = UserDTO(
                 email=data.email,
                 username=data.username,
-                password=hash_password(data.password),
+                password=hash_password(data.password)
             )
 
-            created_user = await UserRepository.create(db, user)
+            created_user = await UserRepository.create(db, user_dto)
 
             logger.info(f"User created with id={created_user.id}")
 

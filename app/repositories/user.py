@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logger import logger
-from app.models.user import User
-
+from app.models.user import User, UserDTO
+from app.core.security import hash_password
 
 class UserRepository:
     @staticmethod
