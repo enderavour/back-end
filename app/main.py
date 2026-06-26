@@ -14,7 +14,6 @@ from app.routers.analytics import router as analytics_router
 from .scheduler import scheduler, setup_scheduler
 from app.core.config import settings
 
-print(settings.DATABASE_URL)
 
 app = FastAPI()
 
