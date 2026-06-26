@@ -1,6 +1,6 @@
-# Task BE #14: Add Export Data 
+# Task BE #15: Add Analytics
 
-Created possibility to export data in JSON and CSV formats. Created appropriate role management rules in order to access and export quiz data. Created test cases for implemented functionality. 
+Created possibility to export data in JSON and CSV formats. Created appropriate role management rules in order to access and export quiz data. Created and run test cases for implemented functionality. 
 
 1. To run the container:
 ```bash
