@@ -65,7 +65,7 @@ async def update_company(
     return await CompanyService.update_company(
         db,
         company_id,
-        current_user,
+        current_user.id,
         data
     )
 
