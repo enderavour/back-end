@@ -25,6 +25,15 @@ class BaseRepository:
         return result.scalars().all()
 
     @classmethod
+    async def update(cls, db, obj, data: dict):
+        for key, value in data.items():
+            setattr(obj, key, value)
+
+        await db.commit()
+        await db.refresh(obj)
+        return obj
+
+    @classmethod
     async def delete(cls, db, obj):
         await db.delete(obj)
         await db.commit()

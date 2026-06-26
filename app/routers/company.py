@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import get_auth_user
@@ -18,7 +18,7 @@ router = APIRouter(
 @router.post(
     "/",
     response_model=CompanySchema,
-    status_code=201
+    status_code=status.HTTP_201_CREATED
 )
 async def create_company(
     data: CompanyCreate,
@@ -32,7 +32,7 @@ async def create_company(
     )
 
 
-@router.get("/")
+@router.get("/", response_model=list[CompanySchema], status_code=status.HTTP_200_OK)
 async def get_companies(
     skip: int = 0,
     limit: int = 10,
@@ -45,7 +45,7 @@ async def get_companies(
     )
 
 
-@router.get("/{company_id}")
+@router.get("/{company_id}", response_model=CompanySchema, status_code=status.HTTP_200_OK)
 async def get_company(
     company_id: int,
     db: AsyncSession = Depends(get_db),
@@ -55,7 +55,7 @@ async def get_company(
         company_id
     )
 
-@router.patch("/{company_id}")
+@router.patch("/{company_id}", response_model=CompanySchema, status_code=status.HTTP_200_OK)
 async def update_company(
     company_id: int,
     data: CompanyUpdate,
@@ -65,6 +65,7 @@ async def update_company(
     return await CompanyService.update_company(
         db,
         company_id,
+        current_user,
         data
     )
 
@@ -81,7 +82,7 @@ async def delete_company(
     )
 
 
-@router.patch("/{company_id}/visibility")
+@router.patch("/{company_id}/visibility", response_model=CompanySchema, status_code=status.HTTP_200_OK)
 async def change_visibility(
     company_id: int,
     is_visible: bool,

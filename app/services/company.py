@@ -81,13 +81,7 @@ class CompanyService:
             exclude_unset=True
         )
 
-        for key, value in update_data.items():
-            setattr(company, key, value)
-
-        await db.commit()
-        await db.refresh(company)
-
-        return company
+        return await CompanyRepository.update(db, company, update_data)
 
     @staticmethod
     async def delete_company(
@@ -145,9 +139,4 @@ class CompanyService:
                 detail="Only owner can change visibility"
             )
 
-        company.is_visible = is_visible
-
-        await db.commit()
-        await db.refresh(company)
-
-        return company
+        return await CompanyRepository.update(db, company, {"is_visible": is_visible})
