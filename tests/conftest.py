@@ -7,12 +7,14 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-
 from app.core.config import settings
 from app.core.database import AsyncSessionLocal
 from app.main import app
 from app.routers.user import get_db
-
+from sqlalchemy import delete
+from app.models.notification import Notification
+from app.models.user import User
+from app.core.security import get_auth_user
 
 async def override_get_db():
     async with AsyncSessionLocal() as session:
@@ -20,6 +22,13 @@ async def override_get_db():
 
 
 app.dependency_overrides[get_db] = override_get_db
+
+# For user tests
+@pytest_asyncio.fixture
+async def test_user():
+    return User(id=1, email="test@test.com")
+
+app.dependency_overrides[get_auth_user] = test_user
 
 
 @pytest_asyncio.fixture
@@ -29,6 +38,14 @@ async def engine():
     yield engine
 
     await engine.dispose()
+
+@pytest_asyncio.fixture
+async def clear_notifications(db_session):
+    await db_session.execute(delete(Notification))
+    await db_session.commit()
+    yield
+    await db_session.execute(delete(Notification))
+    await db_session.commit()
 
 
 @pytest_asyncio.fixture

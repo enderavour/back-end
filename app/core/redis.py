@@ -7,6 +7,7 @@ REDIS_HOST = getenv("REDIS_HOST")
 REDIS_PORT = getenv("REDIS_PORT")
 
 
+
 def get_redis():
     return redis.Redis(
         host=REDIS_HOST,

@@ -6,6 +6,10 @@ from app.models.quiz import AnswerOption
 from app.models.quiz_attempt import QuizAttempt
 from app.models.user_answer import UserAnswer
 from .redis_service import RedisQuizService
+from app.services.company_member import CompanyMemberService
+from .notification import NotificationService
+from app.models.notification import Notification
+
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
@@ -58,6 +62,24 @@ class QuizService:
                 )
 
                 db.add(answer)
+
+        await db.commit()
+        await db.refresh(quiz)
+
+        members = await CompanyMemberService.get_company_members(db, quiz.company_id)
+
+        notifications = []
+
+        for member in members:
+            notifications.append(
+                Notification(
+                    user_id=m.user_id,
+                    message=f'New quiz "{quiz.title} is available"'
+                )
+                for m in members
+            )
+
+        db.add_all(notifications)
 
         await db.commit()
         await db.refresh(quiz)
