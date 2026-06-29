@@ -132,3 +132,65 @@ async def company_requests(
         db,
         company_id
     )
+
+
+@router.post("/{company_id}/admins/{user_id}")
+async def appoint_admin(
+    company_id: int,
+    user_id: int,
+    current_user=Depends(get_auth_user),
+    db=Depends(get_db),
+):
+    company = await CompanyService.get_company(
+        db,
+        company_id
+    )
+
+    member = await CompanyMemberService.get_member(
+        db,
+        company_id,
+        user_id
+    )
+
+    return await CompanyMemberService.make_admin(
+        db,
+        company,
+        member,
+        current_user.id
+    )
+
+
+@router.delete("/{company_id}/admins/{user_id}")
+async def remove_admin(
+    company_id: int,
+    user_id: int,
+    current_user=Depends(get_auth_user),
+    db=Depends(get_db),
+):
+    company = await CompanyService.get_company(
+        db,
+        company_id
+    )
+
+    member = await CompanyMemberService.get_member(
+        db,
+        company_id,
+        user_id
+    )
+
+    return await CompanyMemberService.remove_admin(
+        db,
+        company,
+        member,
+        current_user.id
+    )
+
+@router.get("/{company_id}/admins")
+async def get_admins(
+    company_id: int,
+    db=Depends(get_db),
+):
+    return await CompanyMemberService.get_admins(
+        db,
+        company_id
+    )
