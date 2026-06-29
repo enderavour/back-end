@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - BE-19-add-aws-structure
+      - BE-20-add-github-actions
 
 jobs:
   deploy:
