@@ -1,6 +1,6 @@
-# Task BE #8: Add Company CRUD
+# Task BE #9: Add Company Actions
 
-Implemented Company CRUD, added Owner role, enabled the previleged of the Owner, implemented endpoints for listing companies and retrieving them by ID. 
+Added Invitation and Membership management, User and Owner controls, endpoints for requests and invitations. Added tests for testing designed functionality. 
 
 1. To run the container:
 ```bash
