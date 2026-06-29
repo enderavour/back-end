@@ -1,5 +1,7 @@
 import pytest_asyncio
 import redis.asyncio as redis
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -7,6 +9,17 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.core.config import settings
+from app.core.database import AsyncSessionLocal
+from app.main import app
+from app.routers.user import get_db
+
+
+async def override_get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
+app.dependency_overrides[get_db] = override_get_db
 
 
 @pytest_asyncio.fixture
@@ -41,3 +54,9 @@ async def redis_client():
     yield client
 
     await client.aclose()
+
+
+@pytest_asyncio.fixture
+async def client():
+    async with AsyncClient(base_url="http://localhost:8000") as ac:
+        yield ac
