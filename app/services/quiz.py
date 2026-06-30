@@ -8,6 +8,7 @@ from app.models.user_answer import UserAnswer
 from .redis_service import RedisQuizService
 from app.services.company_member import CompanyMemberService
 from .notification import NotificationService
+from app.repositories.quiz import QuizRepository
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
@@ -104,6 +105,10 @@ class QuizService:
         )
 
         return result.scalars().all()
+
+    @staticmethod
+    async def get_quiz_by_title(db, company_id, quiz_title):
+        return await QuizRepository.get_quiz_by_title(db, company_id, quiz_title)
 
     @staticmethod
     async def delete_quiz(

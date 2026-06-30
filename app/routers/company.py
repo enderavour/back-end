@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import get_auth_user
+from app.core.security import get_auth_user, get_current_user
 from app.db.deps import get_db
 from app.schemas.company import (
     CompanyCreate,
@@ -12,6 +12,7 @@ from app.services.company import CompanyService
 from app.services.company_member import CompanyMemberService
 from app.services.invitation import InvitationService
 from app.services.join_request import JoinRequestService
+from app.services.importsrv import ImportService
 
 router = APIRouter(
     prefix="/companies",
@@ -68,7 +69,8 @@ async def update_company(
     return await CompanyService.update_company(
         db,
         company_id,
-        data
+        current_user.id,
+        data,
     )
 
 @router.delete("/{company_id}")
@@ -193,4 +195,25 @@ async def get_admins(
     return await CompanyMemberService.get_admins(
         db,
         company_id
+    )
+
+@router.post("/{company_id}/import")
+async def import_quizzes(
+    company_id: int,
+    file: UploadFile = File(...),
+    db=Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    company = await CompanyService.get_company(db, company_id)
+
+    if not file.filename.endswith(".xlsx"):
+        raise HTTPException(
+            status_code=400,
+            detail="Only .xlsx files are supported"
+        )
+
+    return await ImportService.import_excel(
+        db,
+        company_id,
+        file
     )
