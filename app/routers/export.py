@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.core.security import get_auth_user
 from app.services.export import ExportService
 from app.services.company import CompanyService
-from app.services.company_member import CompanyMemberService
+from app.services.company import CompanyMemberService
 from app.db.deps import get_db
 from fastapi.responses import Response
 
@@ -37,24 +37,7 @@ async def export_company_json(
     db=Depends(get_db),
     current_user=Depends(get_auth_user)
 ):
-    company = await CompanyService.get_company(
-        db,
-        company_id
-    )
-
-    if company.owner_id != current_user.id:
-
-        member = await CompanyMemberService.get_member(
-            db,
-            company_id,
-            current_user.id
-        )
-
-        if not member or member.role != "admin":
-            raise HTTPException(
-                status_code=403,
-                detail="Forbidden"
-            )
+    await CompanyService.check_owner_or_admin(db, company_id, current_user.id)
 
     return await ExportService.export_company_json(company_id)
 
@@ -64,23 +47,7 @@ async def export_company_csv(
     db=Depends(get_db),
     current_user=Depends(get_auth_user)
 ):
-    company = await CompanyService.get_company(
-        db,
-        company_id
-    )
-
-    if company.owner_id != current_user.id:
-        member = await CompanyMemberService.get_member(
-            db,
-            company_id,
-            current_user.id
-        )
-
-        if not member or member.role != "admin":
-            raise HTTPException(
-                status_code=403,
-                detail="Forbidden"
-            )
+    await CompanyService.check_owner_or_admin(db, company_id, current_user.id)
 
     csv_data = ExportService.export_company_csv(company_id)
 
@@ -99,23 +66,7 @@ async def export_quiz_csv(
     db=Depends(get_db),
     current_user=Depends(get_auth_user)
 ):
-    company = await CompanyService.get_company(
-        db,
-        company_id
-    )
-
-    if company.owner_id != current_user.id:
-        member = await CompanyMemberService.get_member(
-            db,
-            company_id,
-            current_user.id
-        )
-
-        if not member or member.role != "admin":
-            raise HTTPException(
-                status_code=403,
-                detail="Forbidden"
-            )
+    await CompanyService.check_owner_or_admin(db, company_id, current_user.id)
 
     csv_data =  await ExportService.export_quiz_csv(
         company_id,
@@ -138,14 +89,7 @@ async def export_company_user_json(
     db=Depends(get_db),
     current_user=Depends(get_auth_user)
 ):
-    company = await CompanyService.get_company(db, company_id)
-
-    if company.owner_id != current_user.id:
-        member = await CompanyMemberService.get_member(db, company_id, current_user.id)
-
-        if not member or member.role != "admin":
-            raise HTTPException(status_code=403, detail="Forbidden")
-
+    await CompanyService.check_owner_or_admin(db, company_id, current_user.id)
 
     return await ExportService.export_company_user_json(company_id, user_id)
 
@@ -157,13 +101,7 @@ async def export_company_user_csv(
     db=Depends(get_db),
     current_user=Depends(get_auth_user)
 ):
-    company = await CompanyService.get_company(db, company_id)
-
-    if company.owner_id != current_user.id:
-        member = await CompanyMemberService.get_member(db, company_id, current_user.id)
-
-        if not member or member.role != "admin":
-            raise HTTPException(status_code=403, detail="Forbidden")
+    await CompanyService.check_owner_or_admin(db, company_id, current_user.id)
 
     csv_data = await ExportService.export_company_user_csv(company_id, user_id)
 
@@ -183,12 +121,6 @@ async def export_quiz_json(
     db=Depends(get_db),
     current_user=Depends(get_auth_user)
 ):
-    company = await CompanyService.get_company(db, company_id)
-
-    if company.owner_id != current_user.id:
-        member = await CompanyMemberService.get_member(db, company_id, current_user.id)
-
-        if not member or member.role != "admin":
-            raise HTTPException(status_code=403, detail="Forbidden")
+    await CompanyService.check_owner_or_admin(db, company_id, current_user.id)
 
     return await ExportService.export_quiz_json(company_id, quiz_id)
