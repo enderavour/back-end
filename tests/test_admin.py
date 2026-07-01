@@ -4,7 +4,7 @@ import uuid
 from app.models.company import Company
 from app.models.company_member import CompanyMember
 from app.schemas.user import SignUpRequest
-from app.services.company_member import CompanyMemberService
+from app.services.company import CompanyMemberService
 from app.services.user import UserService
 
 

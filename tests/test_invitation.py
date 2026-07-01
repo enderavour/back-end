@@ -2,7 +2,7 @@ import pytest
 from app.services.invitation import InvitationService
 from app.services.join_request import JoinRequestService
 from app.models.company_member import CompanyMember
-from app.services.company_member import CompanyMemberService
+from app.services.company import CompanyMemberService
 from sqlalchemy import select
 
 @pytest.mark.asyncio

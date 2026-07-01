@@ -8,8 +8,7 @@ from app.schemas.company import (
     CompanyUpdate,
     CompanySchema,
 )
-from app.services.company import CompanyService
-from app.services.company_member import CompanyMemberService
+from app.services.company import CompanyService, CompanyMemberService
 from app.services.invitation import InvitationService
 from app.services.join_request import JoinRequestService
 
