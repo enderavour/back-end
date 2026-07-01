@@ -1,12 +1,18 @@
 from fastapi import HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
-from app.core.security import hash_password
+from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.user import SignUpRequest, UserUpdateRequest
-from app.models.user import UserDTO
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
 
 class UserService:
     @staticmethod
@@ -91,3 +97,35 @@ class UserService:
         logger.info(f"User with id={user_id} deleted")
 
         return {"message": "User deleted successfully"}
+
+    @staticmethod
+    async def get_user_by_id(
+        db: AsyncSession,
+        user_id: int,
+    ):
+        result = await UserRepository.get_by_id(db, user_id)
+        return result
+
+    @staticmethod
+    async def get_user_by_email(
+        db: AsyncSession,
+        email: str
+    ):
+        result = await UserRepository.get_by_email(db, email)
+        return result
+
+
+    @staticmethod
+    async def get_or_create_auth0_user(db: AsyncSession, email: str):
+        user = await UserService.get_user_by_email(db, email)
+
+        if user:
+            return user
+
+        user = {
+            "email": email,
+            "username": email.split("@")[0],
+            "password": ""
+        }
+
+        return await UserRepository.create_from_dict(db, user)

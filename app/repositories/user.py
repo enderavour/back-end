@@ -1,54 +1,55 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core.logger import logger
 from app.models.user import User, UserDTO
 from app.core.security import hash_password
 
 class UserRepository:
     @staticmethod
-    async def get_all(
-        db: AsyncSession,
-        skip: int = 0,
-        limit: int = 10,
-    ):
-        result = await db.execute(select(User).offset(skip).limit(limit))
-
+    async def get_all(db, skip=0, limit=10):
+        result = await db.execute(
+            select(User).offset(skip).limit(limit)
+        )
         return result.scalars().all()
 
     @staticmethod
-    async def get_by_id(db: AsyncSession, user_id: int):
-        result = await db.execute(select(User).where(User.id == user_id))
-
+    async def get_by_id(db, user_id: int):
+        result = await db.execute(
+            select(User).where(User.id == user_id)
+        )
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def create(db: AsyncSession, user_dto: UserDTO):
-        user = User(
-            email=user_dto.email,
-            username=user_dto.username,
-            password=user_dto.password
+    async def get_by_email(db, email: str):
+        result = await db.execute(
+            select(User).where(User.email == email)
         )
+        return result.scalar_one_or_none()
 
+    @staticmethod
+    async def create(db, user: User):
         db.add(user)
-        await db.commit()
+        await db.flush()
         await db.refresh(user)
-        logger.info("User was created")
-
         return user
 
     @staticmethod
-    async def delete(db: AsyncSession, user: User):
+    async def delete(db, user: User):
         await db.delete(user)
-        await db.commit()
-        logger.info("User was deleted")
 
     @staticmethod
-    async def update(db: AsyncSession, user: User, data: dict):
-        for key, value in data.items():
-            setattr(user, key, value)
+    async def update(db, user: User, data: dict):
+        for k, v in data.items():
+            setattr(user, k, v)
 
-        logger.info("User was updated")
-        await db.commit()
+        await db.flush()
+        await db.refresh(user)
+        return user
+
+    @staticmethod
+    async def create_from_dict(db, data: dict):
+        user = User(**data)
+        db.add(user)
+        await db.flush()
         await db.refresh(user)
         return user
