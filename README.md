@@ -1,6 +1,6 @@
-# Task BE #13: Redis Workflow
+# Task BE #12: Quiz Workflow
 
-Implemented a Redis storage for holding quiz responses for 48 hours, wrote tests to check the implemented functionality. 
+Implemented functionality to take quizzes for users, implemented storage system where results of completed quizzes are stored and linted to profile, the company and the quiz. Added tests for implemented functionality.  
 
 1. To run the container:
 ```bash
