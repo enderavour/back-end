@@ -5,6 +5,7 @@ from app.models.quiz import Question
 from app.models.quiz import AnswerOption
 from app.models.quiz_attempt import QuizAttempt
 from app.models.user_answer import UserAnswer
+from .redis_service import RedisQuizService
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
@@ -151,6 +152,15 @@ class QuizService:
                         answer_id=answer_id,
                         is_correct=is_correct
                     )
+                )
+
+                await RedisQuizService.save_answer(
+                    user_id=user.id,
+                    company_id=quiz.company_id,
+                    quiz_id=quiz.id,
+                    question_id=question.id,
+                    answer_id=answer_id,
+                    is_correct=is_correct,
                 )
 
         attempt.correct_answers = correct
