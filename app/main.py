@@ -12,6 +12,7 @@ from app.routers.company import router as company_router
 from app.routers.quiz import router as quiz_router
 from app.routers.export import router as export_router
 from app.routers.analytics import router as analytics_router
+from .scheduler import scheduler, setup_scheduler
 
 
 @asynccontextmanager
@@ -25,9 +26,8 @@ app = FastAPI(lifespan=lifespan)
 
 @app.on_event("startup")
 async def startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
+    setup_scheduler()
+    scheduler.start()
 
 setup_cors(app)
 

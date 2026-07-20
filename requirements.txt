@@ -32,3 +32,4 @@ passlib == 1.7.4
 bcrypt==3.2.2
 httpx==0.28.1
 python-jose[cryptography]==3.5.0
+apscheduler==3.11.2

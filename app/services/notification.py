@@ -15,6 +15,8 @@ class NotificationService:
         )
 
         db.add(notification)
+        await db.commit()
+        await db.refresh(notification)
 
         return notification
 
