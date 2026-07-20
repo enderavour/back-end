@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import AsyncSessionLocal
@@ -58,7 +58,7 @@ async def update_user(
 ):
     if current_user.id != user_id:
         raise HTTPException(
-            status_code=403,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="You can edit only your own profile"
         )
 
@@ -69,7 +69,7 @@ async def update_user(
 async def delete_user(user_id: int, current_user = Depends(get_auth_user), db: AsyncSession = Depends(get_db)):
     if current_user.id != user_id:
         raise HTTPException(
-            status_code=403,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="You can delete only your own profile"
         )
     return await UserService.delete_user(db, user_id)

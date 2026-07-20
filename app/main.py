@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
 from app.core.cors import setup_cors
 from app.core.database import engine
@@ -13,7 +14,15 @@ from app.routers.export import router as export_router
 from app.routers.analytics import router as analytics_router
 from .scheduler import scheduler, setup_scheduler
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+
+    await redis_client.aclose()
+
+
+app = FastAPI(lifespan=lifespan)
 
 @app.on_event("startup")
 async def startup():
